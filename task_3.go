@@ -29,7 +29,7 @@ func main() {
 	}
 	fmt.Println("\n=========================================\n")
 	fmt.Println("=== Задача В (массив значений) ===")
-	xValuesB := []float64{0.15, 0.2, 0.3, 0.44, 0.56, 0.6} // Пример уникальных значений
+	xValuesB := []float64{0.15, 0.2, 0.3, 0.44, 0.56, 0.6} 
 	for _, x := range xValuesB {
 		y, err := calculateY(a, x)
 		if err != nil {
