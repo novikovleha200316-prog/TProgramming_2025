@@ -1,41 +1,69 @@
-package main
+/**
+ * Вариант 17
+ * Формула:
+ * y = (a + tan^2(bx)) / (b + ctg^2(ax))
+ * где ctg(x) = 1 / tan(x)
+ */
 
-import (
-	"fmt"
-	"math"
-)
-func calculateY(a, x float64) (float64, error) {
-	xSquared := x * x
-	lgX2 := math.Log10(xSquared)
-	if lgX2-a*a <= 0 {
-		return 0, fmt.Errorf("подкоренное выражение отрицательное или ноль (lg(x^2)=%.4f, a^2=%.4f)", lgX2, a*a)
-	}
-	numerator := a - lgX2
-	denominator := math.Sqrt(lgX2 - a*a)
-	y := numerator / denominator
-	return y, nil
+/**
+ * Вычисляет y по формуле варианта.
+ * @param a параметр a
+ * @param b параметр b
+ * @param x аргумент x (в радианах)
+ * @returns значение y
+ */
+function calculateY(a: number, b: number, x: number): number {
+  const EPS = 1e-12; 
+  const tanBx = Math.tan(b * x);
+  const tanAx = Math.tan(a * x);
+  if (Math.abs(tanAx) < EPS) {
+    throw new Error(
+      `Невозможно вычислить ctg(ax): tan(ax) слишком близок к нулю (x = ${x}).`
+    );
+  }
+  const ctgAx = 1 / tanAx;
+  const denominator = b + ctgAx * ctgAx;
+  if (Math.abs(denominator) < EPS) {
+    throw new Error(`Знаменатель формулы равен нулю (x = ${x}).`);
+  }
+  const numerator = a + tanBx * tanBx;
+  return numerator / denominator;
 }
-func main() {
-	a := 0.1
-	fmt.Println("=== Задача А (вычисление для набора значений) ===")
-	xValuesA := []float64{0.15, 1.37, 0.25, 0.2, 0.3, 0.44, 0.6, 0.56}
-	for _, x := range xValuesA {
-		y, err := calculateY(a, x)
-		if err != nil {
-			fmt.Printf("При x = %.2f \t ОШИБКА: %s\n", x, err)
-		} else {
-			fmt.Printf("При x = %.2f \t y = %.4f\n", x, y)
-		}
-	}
-	fmt.Println("\n=========================================\n")
-	fmt.Println("=== Задача В (массив значений) ===")
-	xValuesB := []float64{0.15, 0.2, 0.3, 0.44, 0.56, 0.6} 
-	for _, x := range xValuesB {
-		y, err := calculateY(a, x)
-		if err != nil {
-			fmt.Printf("При x = %.2f \t ОШИБКА: %s\n", x, err)
-		} else {
-			fmt.Printf("При x = %.2f \t y = %.4f\n", x, y)
-		}
-	}
+function format6(value: number): string {
+  return value.toFixed(6);
 }
+function printRow(x: number, y: number): void {
+  console.log(`${format6(x)} | ${format6(y)}`);
+}
+function main(): void {
+  const a = 0.1;
+  const b = 0.5;
+  const x1 = 0.15;
+  const xk = 1.37;
+  const dx = 0.25;
+  console.log("Задача A");
+  console.log("x | y");
+  for (let x = x1; x <= xk + 1e-12; x += dx) {
+    try {
+      const y = calculateY(a, b, x);
+      printRow(x, y);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.log(`${format6(x)} | ошибка: ${message}`);
+    }
+  }
+  console.log("");
+  const xValues: number[] = [0.2, 0.3, 0.44, 0.6, 0.56];
+  console.log("Задача B");
+  console.log("x | y");
+  for (const x of xValues) {
+    try {
+      const y = calculateY(a, b, x);
+      printRow(x, y);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.log(`${format6(x)} | ошибка: ${message}`);
+    }
+  }
+}
+main();
