@@ -1,84 +1,57 @@
 package main
-
 import (
 	"fmt"
-	"time"
 )
-
-// Описание структуры Employee (Работник)
-type Employee struct {
-	Name     string    // Имя работника
-	Position string    // Должность
-	Salary   float64   // Зарплата
-	HireDate time.Time // Дата приема на работу
+type City struct {
+	Name       string  // Название города
+	Population int     // Население (тыс. чел.)
+	Country    string  // Страна
+	Area       float64 // Площадь (кв. км)
 }
-
-// ==========================================
-// КОНСТРУКТОР
-// ==========================================
-// Функция-конструктор, которая возвращает указатель на новую структуру
-func NewEmployee(name, position string, salary float64, hireDate time.Time) *Employee {
-	return &Employee{
-		Name:     name,
-		Position: position,
-		Salary:   salary,
-		HireDate: hireDate,
+func NewCity(name, country string, population int, area float64) *City {
+	return &City{
+		Name:       name,
+		Country:    country,
+		Population: population,
+		Area:       area,
 	}
 }
-
-// ==========================================
-// МЕТОДЫ СТРУКТУРЫ
-// ==========================================
-
-// Метод 1: Вывод полной информации о работнике
-func (e *Employee) PrintInfo() {
-	// e.HireDate.Format позволяет вывести дату в привычном виде: День.Месяц.Год
-	fmt.Printf("Сотрудник: %s\nДолжность: %s\nЗарплата: %.2f руб.\nПринят на работу: %s\n",
-		e.Name, e.Position, e.Salary, e.HireDate.Format("02.01.2006"))
+func (c *City) PrintInfo() {
+	fmt.Printf("Город: %s\nСтрана: %s\nНаселение: %d тыс. чел.\nПлощадь: %.2f кв. км\n",
+		c.Name, c.Country, c.Population, c.Area)
 	fmt.Println("-------------------------")
 }
-
-// Метод 2: Повышение зарплаты (изменяет данные структуры)
-func (e *Employee) GiveRaise(amount float64) {
-	if amount > 0 {
-		e.Salary += amount
-		fmt.Printf("Успех! Зарплата сотрудника %s повышена на %.2f руб.\n", e.Name, amount)
-		fmt.Println("-------------------------")
+func (c *City) SetPopulation(newPopulation int) {
+	if newPopulation >= 0 {
+		oldPopulation := c.Population
+		c.Population = newPopulation
+		fmt.Printf("Население города %s обновлено: было %d тыс. чел., стало %d тыс. чел.\n",
+			c.Name, oldPopulation, c.Population)
+	} else {
+		fmt.Printf("Ошибка: население не может быть отрицательным (%d)\n", newPopulation)
 	}
+	fmt.Println("-------------------------")
 }
-
-// Метод 3: Расчет стажа (сколько полных лет человек работает)
-func (e *Employee) GetYearsOfExperience() int {
-	now := time.Now()
-	years := now.Year() - e.HireDate.Year()
-
-	// Если в текущем году "годовщина" работы еще не наступила, отнимаем один год
-	if now.YearDay() < e.HireDate.YearDay() {
-		years--
+func (c *City) GetPopulationDensity() float64 {
+	if c.Area <= 0 {
+		fmt.Printf("Ошибка: площадь города %s не может быть равна нулю или отрицательной\n", c.Name)
+		return 0
 	}
-	return years
+	density := float64(c.Population*1000) / c.Area
+	return density
 }
-
-// ==========================================
-// ОСНОВНАЯ ФУНКЦИЯ ДЛЯ ПРОВЕРКИ
-// ==========================================
 func main() {
-	// 1. Задаем дату приема на работу (год, месяц, день, часы, минуты, секунды, наносекунды, часовой пояс)
-	dateOfHire := time.Date(2020, time.March, 15, 0, 0, 0, 0, time.UTC)
-
-	// 2. Создаем работника через наш конструктор
-	emp := NewEmployee("Алексей Смирнов", "Backend-разработчик", 150000.0, dateOfHire)
-
-	// 3. Вызываем Метод 1 (Вывод информации)
-	emp.PrintInfo()
-
-	// 4. Вызываем Метод 3 (Расчет стажа)
-	fmt.Printf("Текущий стаж работы: %d лет\n", emp.GetYearsOfExperience())
+	city := NewCity("Москва", "Россия", 12500, 2511.0)
+	fmt.Println("=== ИНФОРМАЦИЯ О ГОРОДЕ ===")
+	city.PrintInfo()=
+	density := city.GetPopulationDensity()
+	fmt.Printf("Плотность населения: %.2f чел./кв. км\n", density)
 	fmt.Println("-------------------------")
-
-	// 5. Вызываем Метод 2 (Повышение зарплаты)
-	emp.GiveRaise(25000.0)
-
-	// Снова выводим информацию, чтобы убедиться, что зарплата изменилась
-	emp.PrintInfo()
+	fmt.Println("=== ОБНОВЛЕНИЕ ДАННЫХ ===")
+	city.SetPopulation(13000)
+	fmt.Println("=== ОБНОВЛЕННАЯ ИНФОРМАЦИЯ ===")
+	city.PrintInfo()
+	newDensity := city.GetPopulationDensity()
+	fmt.Printf("Обновленная плотность населения: %.2f чел./кв. км\n", newDensity)
+	fmt.Println("-------------------------")
 }
